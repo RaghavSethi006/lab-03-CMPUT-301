@@ -7,7 +7,8 @@
 
 ## References and Resources
 
-List any resources used here, or simply put `N/A` if not applicable.
+used AI in places pentioned in the code and some syntax queries from stack overflow 
+2026-Lab-3-instructions.pdf for lab 
 
 ## Verbal Collaboration
 
