@@ -31,6 +31,7 @@ class MainActivity : ComponentActivity() {
                     CityListScreen(
                         cities = cityRepository.cities,
                         onAddCity = { cityRepository.addCity(it) },
+                        onEditCity ={ City , Int  -> cityRepository.editCity(City, Int)}, //used AIs help to understand the syntax of injecting functions with multiple inputs
                         modifier = Modifier.padding(innerPadding)
                     )
                 }

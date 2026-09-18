@@ -1,5 +1,7 @@
 package com.example.listycity3
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,16 +28,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun CityListScreen(
-    cities: List<City>,
+    cities: MutableList<City>,
     onAddCity: (City) -> Unit,
+    onEditCity: (City,Int) -> Unit, //used AI to resolve syntax error
     modifier: Modifier = Modifier
 ) {
     var newCityName by remember { mutableStateOf("") }
     var newProvinceName by remember { mutableStateOf("") }
     var showAddCityFields by remember { mutableStateOf(false) }
+    var selectedCity by remember { mutableStateOf<City?>(null)  }
+    var selectedCityIndex by remember { mutableStateOf<Int?>(null)  }
 
 
     Column(modifier = modifier.fillMaxSize()) {
@@ -81,20 +87,37 @@ fun CityListScreen(
                 Button(
                     modifier = Modifier.padding(vertical = 12.dp),
                     onClick = {
-                        if (newCityName.isNotBlank() && newProvinceName.isNotBlank()) {
-                            onAddCity(
-                                City(
-                                    name = newCityName,
-                                    province = newProvinceName
+                        if (newCityName.isNotBlank() && newProvinceName.isNotBlank() ) {
+                            if (selectedCityIndex != null){
+                                onEditCity(
+                                    City(
+                                        name = newCityName,
+                                        province = newProvinceName
+                                    ),
+                                    selectedCityIndex!!
+
                                 )
-                            )
+                            }else {
+                                onAddCity(
+                                    City(
+                                        name = newCityName,
+                                        province = newProvinceName
+                                    )
+                                )
+                            }
                             newCityName = ""
                             newProvinceName = ""
                             showAddCityFields = false
+                            selectedCityIndex = null
                         }
                     }
                 ) {
-                    Text("Add City")
+                    Text(
+                        if (selectedCityIndex != null)
+                            "Edit City"
+                        else
+                            "Add City"
+                    )
                 }
 
             }
@@ -103,7 +126,20 @@ fun CityListScreen(
 
         LazyColumn(modifier = modifier.fillMaxSize()) {
             itemsIndexed(cities) { index, city ->
-                CityRow(city = city)
+                CityRow(
+                    city = city,
+                    isSelected = index == selectedCityIndex,
+                    onClick = {
+                        selectedCity = city
+                        selectedCityIndex =
+                            if (selectedCityIndex == index) {
+                                null
+                            } else {
+                                index
+                            }
+                        showAddCityFields = !showAddCityFields
+                    }
+                )
 
                 if (index < cities.lastIndex) {
                     HorizontalDivider()
@@ -114,11 +150,23 @@ fun CityListScreen(
 }
 
 @Composable
-fun CityRow(city: City) {
+fun CityRow(
+    city: City,
+    isSelected: Boolean, //used AI to understand how to use private variable in global func using flag variable
+    onClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 16.dp)
+            .background(
+                if (isSelected)
+                    Color.LightGray
+                else
+                    Color.Transparent
+            )
+            .clickable{onClick()}
+
     ) {
         Text(
             text = city.name,
@@ -139,13 +187,15 @@ fun CityRow(city: City) {
 fun CityListScreenPreview() {
     ListyCity3Theme {
         CityListScreen(
-            cities = listOf(
+            cities = mutableListOf(
                 City("Edmonton", "AB"),
                 City("Vancouver", "BC"),
                 City("Calgary", "AB")
             ),
-            onAddCity = {}
+            onAddCity = {},
+            onEditCity = {city, index ->}
         )
     }
 }
+
 

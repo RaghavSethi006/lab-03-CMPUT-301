@@ -9,10 +9,14 @@ class CityRepository {
         City("Toronto", "ON")
     )
 
-    val cities: List<City>
+    val cities: MutableList<City>
         get() = _cities
 
     fun addCity(city: City) {
         _cities.add(city)
+    }
+
+    fun editCity(newCity:City , newCityIndex : Int){
+        _cities[newCityIndex] = newCity
     }
 }
